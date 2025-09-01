@@ -1,9 +1,9 @@
-# Discord Bot Terminal Interface
+# Discord Bot Terminal Interface (Node.js)
 
 ## Setup
-1. Install dependencies: `pip install -r requirements.txt`
-2. Copy `config.env` and fill in your Discord bot token and client ID
-3. Run: `python bot.py`
+1. Install dependencies: `npm install`
+2. Copy `config.env` and fill in your Discord bot token
+3. Run: `npm start`
 
 ## Usage
 - Select server by number
