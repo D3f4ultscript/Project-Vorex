@@ -2,8 +2,11 @@ services:
   - type: web
     name: discord-bot
     env: python
+    pythonVersion: "3.11"
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: CLIENT_ID
+        sync: false
