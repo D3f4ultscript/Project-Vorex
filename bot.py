@@ -2,6 +2,9 @@ import discord
 from discord.ext import commands
 import asyncio
 import os
+from dotenv import load_dotenv
+
+load_dotenv('config.env')
 
 intents = discord.Intents.default()
 intents.guilds = True
@@ -93,5 +96,7 @@ async def delete_all_roles(server):
     print("Role deletion completed!")
 
 if __name__ == "__main__":
-    token = input("Enter your Discord bot token: ")
+    token = os.getenv('DISCORD_TOKEN')
+    if not token:
+        token = input("Enter your Discord bot token: ")
     bot.run(token)
