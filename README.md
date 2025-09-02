@@ -3,9 +3,9 @@
 A Discord bot with terminal interface for server management operations.
 
 ## Latest Versions (September 2025)
-- Python: 3.13.7
-- discord.py: 2.6.3
-- PyInstaller: 6.4.0
+- Python: 3.12 (for compatibility)
+- discord.py: 2.5.2
+- PyInstaller: 6.15.0
 
 ## Setup
 

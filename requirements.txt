@@ -1,2 +1,2 @@
-discord.py==2.6.3
-pyinstaller==6.4.0
+discord.py==2.5.2
+pyinstaller==6.15.0
