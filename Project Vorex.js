@@ -137,14 +137,11 @@ const rl = readline.createInterface({
 
 function askQuestion(question) {
     return new Promise((resolve) => {
-        process.stdout.write('\n');
         rl.question(question, resolve);
     });
 }
 
 async function startTerminalInterface() {
-    console.log('\n=== TERMINAL INTERFACE ===');
-    
     const guilds = client.guilds.cache.map(guild => guild);
     if (guilds.length === 0) {
         console.log('No servers found!');
@@ -152,36 +149,33 @@ async function startTerminalInterface() {
         return;
     }
     
-    console.log('\nAvailable servers:');
+    console.log('Servers:');
     guilds.forEach((guild, index) => {
         console.log(`${index + 1}. ${guild.name}`);
     });
-    console.log('');
     
-    const serverChoice = await askQuestion('Select server (number): ');
-    const selectedGuild = guilds[parseInt(serverChoice) - 1];
-    
-    if (!selectedGuild) {
-        console.log('Invalid server selection!');
-        rl.close();
-        return;
+    let selectedGuild;
+    while (!selectedGuild) {
+        const serverChoice = await askQuestion('Select server: ');
+        const choice = parseInt(serverChoice);
+        if (choice >= 1 && choice <= guilds.length) {
+            selectedGuild = guilds[choice - 1];
+            console.log(`Selected: ${selectedGuild.name}`);
+        } else {
+            console.log('Invalid selection!');
+        }
     }
     
-    console.log(`\nSelected: ${selectedGuild.name}`);
-    
-    await checkBotRolePosition(selectedGuild);
-    
     while (true) {
-        console.log('\nAvailable commands:');
+        console.log('\nCommands:');
         console.log('1. Give permissions');
-        console.log('2. Delete all channels and categories');
-        console.log('3. Delete all roles');
+        console.log('2. Delete channels');
+        console.log('3. Delete roles');
         console.log('4. Create channels');
         console.log('5. All in One');
         console.log('6. Exit');
-        console.log('');
         
-        const commandChoice = await askQuestion('Select command (number): ');
+        const commandChoice = await askQuestion('Select command: ');
         
         if (commandChoice === '1') {
             await givePermissions(selectedGuild);
@@ -201,7 +195,7 @@ async function startTerminalInterface() {
             console.log('Goodbye!');
             break;
         } else {
-            console.log('Invalid command selection!');
+            console.log('Invalid command!');
         }
     }
     
