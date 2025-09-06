@@ -1,0 +1,19 @@
+{
+  "name": "project-vorex",
+  "version": "1.0.0",
+  "description": "Project Vorex Discord Bot",
+  "main": "Project Vorex.js",
+  "scripts": {
+    "start": "node \"Project Vorex.js\"",
+    "dev": "node \"Project Vorex.js\""
+  },
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=20.x"
+  }
+}
