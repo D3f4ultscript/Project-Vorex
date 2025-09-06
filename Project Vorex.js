@@ -131,11 +131,13 @@ client.login(token);
 
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
+    prompt: ''
 });
 
 function askQuestion(question) {
     return new Promise((resolve) => {
+        console.log(''); // Leerzeile für bessere Trennung
         rl.question(question, resolve);
     });
 }
