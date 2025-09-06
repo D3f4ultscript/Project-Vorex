@@ -1,5 +1,6 @@
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
 const express = require("express");
+const readline = require('readline');
 require('dotenv').config();
 
 const app = express();
@@ -101,6 +102,10 @@ client.once('ready', async () => {
             });
         }
     }
+    
+    setTimeout(() => {
+        startTerminalInterface();
+    }, 2000);
 });
 
 client.on('interactionCreate', async interaction => {
