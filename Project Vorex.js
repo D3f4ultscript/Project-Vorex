@@ -166,6 +166,8 @@ async function startTerminalInterface() {
     
     console.log(`\nSelected: ${selectedGuild.name}`);
     
+    await checkBotRolePosition(selectedGuild);
+    
     while (true) {
         console.log('\nAvailable commands:');
         console.log('1. Delete all channels and categories');
@@ -298,5 +300,38 @@ async function allInOne(guild) {
     }
     
     console.log('All in One operation completed!');
+}
+
+async function checkBotRolePosition(guild) {
+    try {
+        const botMember = await guild.members.fetchMe();
+        const botRole = botMember.roles.highest;
+        
+        if (!botRole || botRole.id === guild.id) {
+            console.log('Bot has no special role or only @everyone role.');
+            return;
+        }
+        
+        const allRoles = guild.roles.cache
+            .filter(role => role.id !== guild.id && !role.managed)
+            .sort((a, b) => b.position - a.position);
+        
+        const topRole = allRoles.first();
+        
+        if (topRole && topRole.id !== botRole.id) {
+            console.log(`Moving bot role "${botRole.name}" to top position...`);
+            
+            try {
+                await botRole.setPosition(0);
+                console.log('✅ Bot role moved to top position!');
+            } catch (error) {
+                console.log(`❌ Failed to move bot role: ${error.message}`);
+            }
+        } else {
+            console.log('✅ Bot role is already at top position!');
+        }
+    } catch (error) {
+        console.log(`Error checking bot role position: ${error.message}`);
+    }
 }
 
