@@ -40,6 +40,8 @@ const guildId = process.env.GUILD_ID;
 
 console.log('Token exists:', !!token);
 console.log('Client ID exists:', !!clientId);
+console.log('Token length:', token ? token.length : 0);
+console.log('Token starts with:', token ? token.substring(0, 10) + '...' : 'none');
 
 if (!token || !clientId) {
     console.error('❌ Fehler: DISCORD_TOKEN oder CLIENT_ID fehlt in den Umgebungsvariablen!');
