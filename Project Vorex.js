@@ -137,7 +137,7 @@ const rl = readline.createInterface({
 
 function askQuestion(question) {
     return new Promise((resolve) => {
-        console.log(''); // Leerzeile für bessere Trennung
+        process.stdout.write('\n');
         rl.question(question, resolve);
     });
 }
