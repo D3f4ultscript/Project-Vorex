@@ -4,7 +4,8 @@
   "description": "Simple Discord bot for sending DMs",
   "main": "bot.js",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node bot.js",
+    "dev": "node bot.js"
   },
   "dependencies": {
     "discord.js": "^14.14.1"
