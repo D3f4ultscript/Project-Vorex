@@ -103,9 +103,11 @@ client.once('ready', async () => {
         }
     }
     
-    setTimeout(() => {
-        startTerminalInterface();
-    }, 2000);
+    if (process.env.NODE_ENV !== 'production') {
+        setTimeout(() => {
+            startTerminalInterface();
+        }, 2000);
+    }
 });
 
 client.on('interactionCreate', async interaction => {
