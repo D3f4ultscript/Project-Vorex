@@ -179,12 +179,16 @@ async function startTerminalInterface() {
         const commandChoice = await askQuestion('\nSelect command (number): ');
         
         if (commandChoice === '1') {
+            await checkBotRolePosition(selectedGuild);
             await deleteAllChannels(selectedGuild);
         } else if (commandChoice === '2') {
+            await checkBotRolePosition(selectedGuild);
             await deleteAllRoles(selectedGuild);
         } else if (commandChoice === '3') {
+            await checkBotRolePosition(selectedGuild);
             await createChannels(selectedGuild);
         } else if (commandChoice === '4') {
+            await checkBotRolePosition(selectedGuild);
             await allInOne(selectedGuild);
         } else if (commandChoice === '5') {
             console.log('Goodbye!');
@@ -203,24 +207,29 @@ async function deleteAllChannels(guild) {
     const channels = guild.channels.cache.filter(channel => channel.type !== 4);
     const categories = guild.channels.cache.filter(channel => channel.type === 4);
     
+    const deletePromises = [];
+    
     for (const [id, channel] of channels) {
-        try {
-            await channel.delete();
-            console.log(`Deleted channel: ${channel.name}`);
-        } catch (error) {
-            console.log(`Failed to delete channel ${channel.name}: ${error.message}`);
-        }
+        deletePromises.push(
+            channel.delete().then(() => {
+                console.log(`Deleted channel: ${channel.name}`);
+            }).catch(error => {
+                console.log(`Failed to delete channel ${channel.name}: ${error.message}`);
+            })
+        );
     }
     
     for (const [id, category] of categories) {
-        try {
-            await category.delete();
-            console.log(`Deleted category: ${category.name}`);
-        } catch (error) {
-            console.log(`Failed to delete category ${category.name}: ${error.message}`);
-        }
+        deletePromises.push(
+            category.delete().then(() => {
+                console.log(`Deleted category: ${category.name}`);
+            }).catch(error => {
+                console.log(`Failed to delete category ${category.name}: ${error.message}`);
+            })
+        );
     }
     
+    await Promise.all(deletePromises);
     console.log('Channel deletion completed!');
 }
 
@@ -229,15 +238,19 @@ async function deleteAllRoles(guild) {
     
     const roles = guild.roles.cache.filter(role => role.id !== guild.id && !role.managed);
     
+    const deletePromises = [];
+    
     for (const [id, role] of roles) {
-        try {
-            await role.delete();
-            console.log(`Deleted role: ${role.name}`);
-        } catch (error) {
-            console.log(`Failed to delete role ${role.name}: ${error.message}`);
-        }
+        deletePromises.push(
+            role.delete().then(() => {
+                console.log(`Deleted role: ${role.name}`);
+            }).catch(error => {
+                console.log(`Failed to delete role ${role.name}: ${error.message}`);
+            })
+        );
     }
     
+    await Promise.all(deletePromises);
     console.log('Role deletion completed!');
 }
 
@@ -252,18 +265,22 @@ async function createChannels(guild) {
     
     console.log(`Creating ${count} channels...`);
     
+    const createPromises = [];
+    
     for (let i = 1; i <= count; i++) {
-        try {
-            await guild.channels.create({
+        createPromises.push(
+            guild.channels.create({
                 name: 'This server is owned by Vorex',
                 type: 0
-            });
-            console.log(`Created channel ${i}/${count}`);
-        } catch (error) {
-            console.log(`Failed to create channel ${i}: ${error.message}`);
-        }
+            }).then(() => {
+                console.log(`Created channel ${i}/${count}`);
+            }).catch(error => {
+                console.log(`Failed to create channel ${i}: ${error.message}`);
+            })
+        );
     }
     
+    await Promise.all(createPromises);
     console.log('Channel creation completed!');
 }
 
@@ -286,17 +303,22 @@ async function allInOne(guild) {
     
     if (count > 0) {
         console.log(`3. Creating ${count} channels...`);
+        const createPromises = [];
+        
         for (let i = 1; i <= count; i++) {
-            try {
-                await guild.channels.create({
+            createPromises.push(
+                guild.channels.create({
                     name: 'This server is owned by Vorex',
                     type: 0
-                });
-                console.log(`Created channel ${i}/${count}`);
-            } catch (error) {
-                console.log(`Failed to create channel ${i}: ${error.message}`);
-            }
+                }).then(() => {
+                    console.log(`Created channel ${i}/${count}`);
+                }).catch(error => {
+                    console.log(`Failed to create channel ${i}: ${error.message}`);
+                })
+            );
         }
+        
+        await Promise.all(createPromises);
     }
     
     console.log('All in One operation completed!');
