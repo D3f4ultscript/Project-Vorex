@@ -40,6 +40,7 @@ const guildId = process.env.GUILD_ID;
 
 if (!token || !clientId) {
     console.error('❌ Fehler: DISCORD_TOKEN oder CLIENT_ID fehlt in den Umgebungsvariablen!');
+    console.error('Lokale .env Datei erstellen oder Environment Variables auf Render setzen!');
     process.exit(1);
 }
 
@@ -76,19 +77,11 @@ client.once('ready', async () => {
     try {
         console.log('Registering Slash Commands...');
         let data;
-        if (guildId) {
-            console.log(`Using guild registration for faster updates (GUILD_ID=${guildId}).`);
-            data = await rest.put(
-                Routes.applicationGuildCommands(clientId, guildId),
-                { body: commands }
-            );
-        } else {
-            console.log('No GUILD_ID set. Registering commands globally (may take up to 1h to propagate).');
-            data = await rest.put(
-                Routes.applicationCommands(clientId),
-                { body: commands }
-            );
-        }
+        console.log('Registering commands globally (works on all servers).');
+        data = await rest.put(
+            Routes.applicationCommands(clientId),
+            { body: commands }
+        );
         console.log(`✅ Successfully registered ${data.length} slash commands!`);
         console.log('Registered commands:', data.map(cmd => cmd.name).join(', '));
     } catch (error) {
