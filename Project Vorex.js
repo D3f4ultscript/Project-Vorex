@@ -38,6 +38,9 @@ const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.CLIENT_ID;
 const guildId = process.env.GUILD_ID;
 
+console.log('Token exists:', !!token);
+console.log('Client ID exists:', !!clientId);
+
 if (!token || !clientId) {
     console.error('❌ Fehler: DISCORD_TOKEN oder CLIENT_ID fehlt in den Umgebungsvariablen!');
     console.error('Lokale .env Datei erstellen oder Environment Variables auf Render setzen!');
