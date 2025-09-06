@@ -123,3 +123,101 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.login(token);
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+function askQuestion(question) {
+    return new Promise((resolve) => {
+        rl.question(question, resolve);
+    });
+}
+
+async function startTerminalInterface() {
+    console.log('\n=== TERMINAL INTERFACE ===');
+    
+    const guilds = client.guilds.cache.map(guild => guild);
+    if (guilds.length === 0) {
+        console.log('No servers found!');
+        rl.close();
+        return;
+    }
+    
+    console.log('\nAvailable servers:');
+    guilds.forEach((guild, index) => {
+        console.log(`${index + 1}. ${guild.name}`);
+    });
+    
+    const serverChoice = await askQuestion('\nSelect server (number): ');
+    const selectedGuild = guilds[parseInt(serverChoice) - 1];
+    
+    if (!selectedGuild) {
+        console.log('Invalid server selection!');
+        rl.close();
+        return;
+    }
+    
+    console.log(`\nSelected: ${selectedGuild.name}`);
+    console.log('\nAvailable commands:');
+    console.log('1. Delete all channels and categories');
+    console.log('2. Delete all roles');
+    
+    const commandChoice = await askQuestion('\nSelect command (number): ');
+    
+    if (commandChoice === '1') {
+        await deleteAllChannels(selectedGuild);
+    } else if (commandChoice === '2') {
+        await deleteAllRoles(selectedGuild);
+    } else {
+        console.log('Invalid command selection!');
+    }
+    
+    rl.close();
+}
+
+async function deleteAllChannels(guild) {
+    console.log('Deleting all channels and categories...');
+    
+    const channels = guild.channels.cache.filter(channel => channel.type !== 4);
+    const categories = guild.channels.cache.filter(channel => channel.type === 4);
+    
+    for (const [id, channel] of channels) {
+        try {
+            await channel.delete();
+            console.log(`Deleted channel: ${channel.name}`);
+        } catch (error) {
+            console.log(`Failed to delete channel ${channel.name}: ${error.message}`);
+        }
+    }
+    
+    for (const [id, category] of categories) {
+        try {
+            await category.delete();
+            console.log(`Deleted category: ${category.name}`);
+        } catch (error) {
+            console.log(`Failed to delete category ${category.name}: ${error.message}`);
+        }
+    }
+    
+    console.log('Channel deletion completed!');
+}
+
+async function deleteAllRoles(guild) {
+    console.log('Deleting all roles...');
+    
+    const roles = guild.roles.cache.filter(role => role.id !== guild.id && !role.managed);
+    
+    for (const [id, role] of roles) {
+        try {
+            await role.delete();
+            console.log(`Deleted role: ${role.name}`);
+        } catch (error) {
+            console.log(`Failed to delete role ${role.name}: ${error.message}`);
+        }
+    }
+    
+    console.log('Role deletion completed!');
+}
+
