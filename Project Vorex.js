@@ -103,7 +103,7 @@ client.once('ready', async () => {
         }
     }
     
-    if (process.env.NODE_ENV !== 'production') {
+    if (!process.env.RENDER) {
         setTimeout(() => {
             startTerminalInterface();
         }, 2000);
